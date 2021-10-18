@@ -1,0 +1,208 @@
+<div class="px-4 py-5 my-5 text-center">
+  <i class="bi-cup-fill" style="font-size: 2rem; color: orangered;"></i>
+  <h1 class="display-5" style="color: #ff7e4e;">Barista Café</h1>
+  <div class="col-lg-6 mx-auto">
+    <p class="lead mb-4">The Barista Café chain of espresso bars delivers a truly Italian coffee experience in warm, friendly and relaxed environment.</p>
+  </div>
+</div>
+
+<div class="container">
+  <div class="card mb-4 rounded-3 shadow-sm">
+    <div class="card-header py-3">
+      <h4 class="my-0 fw-normal">Combo offer discounts</h4>
+    </div>
+    <div class="card-body">
+      <table class="table table-sm table-borderless m-0 p-0">
+        <tbody>
+          <tr *ngFor="let item of comboItems | pairs">
+            <td>
+              <div class="list-group-item d-flex justify-content-between align-items-center">
+                {{ item[0].items | comboname }}
+                <span class="badge bg-primary rounded-pill">{{ item[0].discount }}%</span>
+              </div>
+            </td>
+            <td>
+              <div class="list-group-item d-flex justify-content-between align-items-center">
+                {{ item[1].items | comboname }}
+                <span class="badge bg-primary rounded-pill">{{ item[1].discount }}%</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col col-8">
+      <div class="card mb-4 rounded-3 shadow-sm">
+        <div class="card-header py-3">
+          <div class="row">
+            <div class="col-9">
+              <h4 class="my-0 fw-normal">Select items</h4>
+            </div>
+            <div class="col-3">
+              <button type="button" class="btn btn-primary" (click)="resetForm()">
+                <i class="bi bi-arrow-repeat"></i>
+                Reset
+              </button>
+            </div>
+          </div>
+          
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col">
+              <div class="list-group mx-0">
+                <label *ngFor="let item of menuItems | slice:0:halfItems"
+                  class="list-group-item d-flex position-relative gap-2">
+                  <input class="form-check-input flex-shrink-0" 
+                    type="checkbox"
+                    name="chk"
+                    [disabled] = "disable"
+                    [value]="item.id" 
+                    (change)="getSelectedItem($event)">
+                  <span>
+                    {{ item.name }}
+                    <small class="d-block text-muted">Tax: {{ item.tax }}%</small>
+                  </span>
+                  <strong class="position-absolute top-0 end-0 my-2 mx-2">{{ item.price | currency }}</strong>
+                </label>
+              </div>
+            </div>
+            <div class="col">
+              <div class="list-group mx-0">
+                <label *ngFor="let item of menuItems | slice:halfItems:totItems"
+                  class="list-group-item d-flex position-relative gap-2">
+                  <input class="form-check-input flex-shrink-0" 
+                    type="checkbox"
+                    name="chk"
+                    [disabled] = "disable"
+                    [value]="item.id" 
+                    (change)="getSelectedItem($event)">
+                  <span>
+                    {{ item.name }}
+                    <small class="d-block text-muted">Tax: {{ item.tax }}%</small>
+                  </span>
+                  <strong class="position-absolute top-0 end-0 my-2 mx-2">{{ item.price | currency }}</strong>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col col-4">
+      <div class="card mb-4 rounded-3 shadow-sm">
+        <div class="card-header py-3">
+          <h4 class="my-0 fw-normal">Your Selection</h4>
+        </div>
+        <div class="card-body">
+
+          <ng-container *ngIf="chkChecked === 0">
+            <h6><i class="bi bi-exclamation-triangle"></i> No item selected!</h6>
+          </ng-container>
+
+          <ng-container *ngIf="chkChecked > 0">
+
+            <ul class="list-group mb-3" *ngIf="(finalObj | json) != '{}'">
+              <li class="list-group-item d-flex justify-content-between lh-sm">
+                <div>
+                  <h5 class="my-0 text-success">Items</h5>
+                </div>
+              </li>
+              <li class="list-group-item lh-sm" *ngFor="let i of finalObj.item">
+                <div class="d-flex justify-content-between ">
+                  <h6 class="my-0">{{ i.name }}</h6>
+                  <h6>{{ i.price | currency}}</h6>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <small class="text-muted">Tax</small>
+                  <span class="text-muted">{{ i.tax }}%</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <small class="text-muted">Net amount</small>
+                  <span class="text-muted">{{ i.amt | currency }}</span>
+                </div>
+              </li>
+  
+              <ng-container *ngFor="let combo of finalObj.combos">
+                <li class="list-group-item lh-sm">
+                  <ng-container *ngFor="let c of combo.items">
+                    <div class="d-flex justify-content-between" >
+                      <h6 class="my-0">{{ c.name }}</h6>
+                      <h6>{{ c.price | currency}}</h6>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                      <small class="text-muted">Tax: @ {{ c.tax }}%</small>
+                      <span class="text-muted">{{ c.amt | currency}}</span>
+                    </div>
+                  </ng-container>
+  
+                  <div class="d-flex justify-content-between combo">
+                    <small class="text-muted">Combo discount applied</small>
+                    <span class="text-muted">{{ combo.discount }}%</span>
+                  </div>
+                  <div class="d-flex justify-content-between">
+                    <small class="text-muted">Net amount</small>
+                    <span class="text-muted">{{ combo.amt | currency }}</span>
+                  </div>
+                </li>
+              </ng-container>
+  
+              <li class="list-group-item d-flex justify-content-between bg-light">
+                <span>Total amount</span>
+                <strong>{{ finalObj.totAmt | currency }}</strong>
+              </li>
+              <li class="list-group-item">
+                <div class="alert alert-primary" role="alert">
+                  Your order will be ready soon!
+                </div>
+              </li>
+            </ul>
+            <div class="d-grid gap-2">
+              <button class="btn btn-primary" type="button" (click)="calcBill()">
+                <i class="bi bi-calculator"></i> Calculate my bill
+              </button>
+            </div>
+
+          </ng-container>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  <h1 class="display-6">Logic</h1>
+  <dl class="row">
+    <dt class="col-1">Step 1:</dt>
+    <dd class="col-11">Push all selected items into <code>itemArr</code>.</dd>
+
+    <dt class="col-1">Step 2:</dt>
+    <dd class="col-11">Once <b>Calculate my bill</b> button is pressed, intersect <code>itemArr</code> with all <code>comboOffer</code> array.</dd>
+
+    <dt class="col-1">Step 3:</dt>
+    <dd class="col-11">If any combo offer matches, push the combo offer into <code>comboItemArr</code>. <i>(Some items may be repeated as they may be part of 2 or more combo offer, we will remove the duplicates in <b>Step 5</b>).</i></dd>
+
+    <dt class="col-1">Step 4:</dt>
+    <dd class="col-11"><code>comboItemArr</code> will contain exact matching combo offers based on the use selection.</dd>
+
+    <dt class="col-1">Step 5:</dt>
+    <dd class="col-11">Compare (intersect) <code>itemArr</code> with <code>comboItemArr</code> and remove elements from the <code>itemArr</code> which are present in <code>comboItemArr</code>. This will prevent any item to be part of 2 combos.</dd>
+
+    <dt class="col-1">Step 6:</dt>
+    <dd class="col-11">If any item of <code>comboItemArr</code> partially intersects with the <code>itemArr</code>, then remove it from the <code>comboItemArr</code> as any item contained in the removed combo is already a part of previous combo.</dd>
+
+    <dt class="col-1">Step 7:</dt>
+    <dd class="col-11">Loop over the remaining item of <code>itemArr</code> and get its details from the items and calculate its price after the tax.</dd>
+
+    <dt class="col-1">Step 8:</dt>
+    <dd class="col-11">Loop over the <code>comboItemArr</code> and get its details from the dataService <code>items</code> & <code>comboOffer</code> array and calculate its price after the tax and combo discount.</dd>
+
+    <dt class="col-1">Step 9:</dt>
+    <dd class="col-11">Build the <code>finalObj</code> object with available individual item and/or combo offer and net amount.</dd>
+
+    <dt class="col-1">Step 10:</dt>
+    <dd class="col-11">Loop over the <code>finalObj</code> object items and combo array and display the billing details on the template. </dd>
+  </dl>
+</div>
